@@ -1,5 +1,5 @@
 #Puppet_Atlassian#
-================
+
 ###Coté agent###
 
 - Commencez par faire un update de la base de paquet grâce à la commande 
