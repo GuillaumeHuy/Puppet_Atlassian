@@ -1,4 +1,4 @@
-#Puppet_Atlassian#
+#Puppet Atlassian#
 
 ###Coté agent###
 
