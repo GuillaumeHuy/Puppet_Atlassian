@@ -1,0 +1,11 @@
+<included>
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<file>/data/logs/atlassianstash.log</file>
+		<encoder>
+			<pattern>${log.format}</pattern>
+		</encoder>
+	</appender>
+	<root>
+		<appenderref ref="FILE"/>
+	</root>
+</included>

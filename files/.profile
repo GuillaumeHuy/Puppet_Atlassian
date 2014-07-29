@@ -1,0 +1,3 @@
+JAVA_HOME=/opt/jvm/7
+PATH=$PATH:$JAVA_HOME/bin
+export PATH JAVA_HOME
