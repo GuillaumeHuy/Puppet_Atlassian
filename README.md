@@ -27,3 +27,21 @@ sudo apt-get install puppetmaster
 
 - Il faut ensuite ouvrir le port 8140 soit directement dans le gestionnaire windows azure soit grâce à iptables:
 sudo iptables -A INPUT -p tcp -m tcp --dport 8140 -j ACCEPT
+
+- Dans /etc/puppet/fileserver.conf ajouter la ligne suivante dans la partie [files]:
+allow *
+
+- Créer le fichier /etc/puppet/autosign.conf et ajouter la ligne indiquant qu'on autorise toutes les demandes certificats automatiquement:
+*
+
+- Dans le répertoire /etc/puppet/manifest/ ajouter l'ensemble des fichiers :
+	-site.pp
+	-java.pp
+	-postgresql.pp
+	-jira.pp
+	-crowd.pp
+	-stash.pp
+
+- Dans le répertoire /etc/puppet/files/ ajouter l'ensemble des fichiers :
+	-.profile
+	-logback.xml
