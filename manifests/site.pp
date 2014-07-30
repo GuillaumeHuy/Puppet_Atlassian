@@ -17,4 +17,5 @@ node default {
 	include git
 	include jira
 	include crowd
+	include stash
 }
