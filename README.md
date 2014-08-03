@@ -1,6 +1,8 @@
 #Puppet Atlassian#
 
-###Coté serveur###
+Sur ubuntu 14.04
+
+##Coté serveur##
 
 - Commencez par faire un update de la base de paquet grâce à la commande 
 sudo apt-get update
@@ -33,7 +35,7 @@ puppet_conf_master.txt
 	-logback.xml
 	
 	
-###Coté agent###
+##Coté agent##
 
 - Commencez par faire un update de la base de paquet grâce à la commande 
 sudo apt-get update
@@ -47,14 +49,36 @@ ipduserveur	puppet.puppetmaster puppet
 - Dans /etc/puppet/puppet.conf supprimez le contenu et remplacez le par celui de :
 puppet_conf_agent.txt
 
+- Il faut ensuite ouvrir le port 8139 soit directement dans le gestionnaire windows azure soit grâce à iptables:
+sudo iptables -A INPUT -p tcp -m tcp --dport 8139 -j ACCEPT
+
 - Pour rendre possible l'utilisation de puppet agent, utilisez la commande suivante:
 sudo puppet agent --enable
 
 - Vous pouvez maintenant lancer l'installation des outils atlassian avec la commande:
 sudo puppet agent --waitforcert 60 --test
 
--Une fois l'installation terminée, il faudra ouvrir les ports des différents outils:
-jira = 8080
-stash = 7990
-crowd = 8095
-fisheye = 8060
+###Jira###
+
+- Lancez /opt/atlassian/jira/bin/config.sh. Une fenêtre va s'ouvrir. 
+
+- Dans l'onglet JIRA Home, dans le champs JIRA Home directory ajoutez  : '/data/atlassian/jira'
+
+- Démarrez jira avec le script /opt/atlassian/jira/bin/start-jira.sh
+
+- Il faut ensuite ouvrir le port 8080 soit directement dans le gestionnaire windows azure soit grâce à iptables:
+sudo iptables -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+
+###Stash###
+
+- Démarrez stash avec le script /opt/atlassian/stash/bin/start-stash.sh
+
+- Il faut ensuite ouvrir le port 7990 soit directement dans le gestionnaire windows azure soit grâce à iptables:
+sudo iptables -A INPUT -p tcp -m tcp --dport 7990 -j ACCEPT
+
+###Crowd###
+
+- Démarrez crowd avec le script /opt/atlassian/crowd/start-crowd.sh
+
+- Il faut ensuite ouvrir le port 8095 soit directement dans le gestionnaire windows azure soit grâce à iptables:
+sudo iptables -A INPUT -p tcp -m tcp --dport 8095 -j ACCEPT
