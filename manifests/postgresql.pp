@@ -2,12 +2,12 @@ class postgresql{
 
         package{ 'ssl-cert':
         ensure => installed,
-        before => Package['postgresql'],
+        before => Package['postgresql-9.3'],
 	require => Class['java'],
         }
 
-        package{ 'postgresql':
-        ensure => '9.3+153bzr1',
+        package{ 'postgresql-9.3':
+        ensure => installed,
         before => File['/data'],
         }
 

@@ -1,12 +1,12 @@
 class jira {
-#création des dossiers
+#creation des dossiers
         exec{ 'createoptatla':
         command => 'sudo mkdir -p /opt/atlassian',
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
         logoutput =>true,
         onlyif => '[ ! -d /opt/atlassian ]',
         before  => Exec['createdataatla'],
-		require => Class['git'],
+	require => Class['git'],
         }
 
 	exec{ 'createdataatla':
@@ -25,7 +25,7 @@ class jira {
         before  => Exec['adduserjira'],
         }
 
-#création et configuration de l'utilisateur jira
+#creation et configuration de l'utilisateur jira
     exec {'adduserjira':
         command => 'sudo adduser jira',
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
@@ -38,10 +38,10 @@ class jira {
 	file {'/home/jira/.profile':
         source => 'puppet:///files/.profile',
         replace =>true,
-		before => Group['atlaslog'],
+	before => Group['atlaslog'],
         }
 
-#création du groupe atlaslog et ajout de l'utilisateur jira à ce groupe
+#creation du groupe atlaslog et ajout de l'utilisateur jira a ce groupe
 	group {'atlaslog':
         ensure => present,
         before => Exec['usermodjira'],
@@ -51,28 +51,28 @@ class jira {
         command => 'sudo usermod -a -G atlaslog jira',
         logoutput =>true,
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
-		before => Exec['createuserjira'],
+	before => Exec['createuserjira'],
         }
 
-#création de l'utilisateur postgres jira et création de sa base de données associé
+#creation de l'utilisateur postgres jira et creation de sa base de donnees associe
 	exec {'createuserjira':
         command => 'psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname=\'jira\'" | grep -q 1 || createuser -D -P jira',
-		user=>'postgres',
+	user=>'postgres',
         logoutput =>true,
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
-		before => Exec['createdbjira'],
+	before => Exec['createdbjira'],
         }
 	
 	exec {'createdbjira':
         command => 'createdb -O jira jira',
-		user=>'postgres',
+	user=>'postgres',
         logoutput =>true,
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
-		onlyif => '[ ! psql -l | grep <exact_dbname> | wc -l ]',
-		before => Exec['sshd_configjira'],
+	onlyif => '[ ! psql -l | grep <exact_dbname> | wc -l ]',
+	before => Exec['sshd_configjira'],
         }
 
-#configuration et redémarrage du service ssh
+#configuration et redemarrage du service ssh
 	exec {'sshd_configjira':
         command => 'sudo echo "DenyUsers jira" >> /etc/ssh/sshd_config',
         logoutput =>true,
@@ -87,14 +87,14 @@ class jira {
         before => Exec['wgetjira'],
         }
 
-#téléchargement, extraction et suppression de l'archive jira
+#telechargement, extraction et suppression de l'archive jira
 	exec {'wgetjira':
         command => 'sudo wget http://www.atlassian.com/software/jira/downloads/binary/atlassian-jira-6.1.7.tar.gz',
         cwd => '/opt/atlassian',
         logoutput =>true,
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
         onlyif => '[ ! -e "atlassian-jira-6.1.7-standalone" ]',
-		before => Exec['tarjira'],
+	before => Exec['tarjira'],
         }
 
 	exec {'tarjira':
@@ -103,7 +103,7 @@ class jira {
         logoutput =>true,
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
         onlyif => '[ ! -e "atlassian-jira-6.1.7-standalone" ]',
-		before => Exec['rmjiragz'],
+	before => Exec['rmjiragz'],
         }
 
 	exec {'rmjiragz':
@@ -111,18 +111,18 @@ class jira {
         cwd => '/opt/atlassian',
         logoutput =>true,
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
-        onlyif => '[ ! -e "atlassian-jira-6.1.7-standalone" ]',
-		before => Exec['lnjira'],
+        onlyif => '[ ! -e "atlassian-jira-6.1.7.tar.gz" ]',
+	before => Exec['lnjira'],
         }
 
-#création du lien symbolique jira pointant sur le dossier extrait
+#creation du lien symbolique jira pointant sur le dossier extrait
 	exec {'lnjira':
         command => 'sudo ln -s atlassian-jira-6.1.7-standalone/ jira',
         cwd => '/opt/atlassian',
         logoutput =>true,
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
         onlyif => '[ ! -e "jira" ]',
-		before => Exec['chownjira'],
+	before => Exec['chownjira'],
         }
 
 #attribution des droits sur les dossiers
@@ -131,15 +131,14 @@ class jira {
         cwd => '/opt/atlassian',
         logoutput =>true,
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
-        onlyif => '[ ! -e "jira" ]',
-		before => Exec['home-rollingjira'],
+	before => Exec['home-rollingjira'],
         }
 
 #modification du fichier de configuration de log
 	exec {'home-rollingjira':
         command => 'sudo sed -i -e "s/log4j.appender.filelog=com.atlassian.jira.logging.JiraHomeAppende/log4j.appender.filelog=com.atlassian.jira.logging.RollingFileAppender/g" jira/atlassian-jira/WEB-INF/classes/log4j.properties',
         logoutput =>true,
-		cwd => '/opt/atlassian',
+	cwd => '/opt/atlassian',
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
         before => Exec['home-rollingp2jira'],
         }
@@ -148,24 +147,24 @@ class jira {
 	exec {'home-rollingp2jira':
         command => 'sudo sed -i -e "s/log4j.appender.filelog.File=atlassianjira.log/log4j.appender.filelog.File=\/data\/logs\/atlassianjira.log/g" jira/atlassian-jira/WEB-INF/classes/log4j.properties',
         logoutput =>true,
-		cwd => '/opt/atlassian',
+	cwd => '/opt/atlassian',
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
         before => Exec['setenvjira'],
         }
 
 	exec {'setenvjira':
-        command => 'sudo echo "CATALINA_OUT=/data/logs/atlassianjiracatalina.out" >> jira/bin/setenv.sh',
-		cwd => '/opt/atlassian',
+        command => 'sudo echo CATALINA_OUT="/data/logs/atlassianjiracatalina.out" >> jira/bin/setenv.sh',
+	cwd => '/opt/atlassian',
         logoutput =>true,
         path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
-		before  => Exec['createoptservicejira'],
+	before  => Exec['createoptservicejira'],
 	}
 
-    exec{ 'createoptservicejira':
-        command => 'sudo mkdir -p /data/logs',
-        path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
-        logoutput =>true,
-        onlyif => '[ ! -d /data/logs ]',
-       	}
+	exec{ 'createoptservicejira':
+	command => 'sudo mkdir -p /data/logs',
+	path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/" ],
+	logoutput =>true,
+	onlyif => '[ ! -d /data/logs ]',
+	}
 }
 
